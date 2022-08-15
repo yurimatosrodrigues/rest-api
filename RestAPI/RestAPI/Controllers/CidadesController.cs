@@ -1,15 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RestAPI.Models;
+using RestAPI.Repository;
 
 namespace RestAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("")]
     [ApiController]
     public class CidadesController : Controller
     {
-       [HttpGet("hello-world")]
-       public string Hello()
+       [HttpGet("paises/{idPais}/estados/{idEstado}/cidades")]
+       public List<Cidade> GetCidades([FromQuery] string nome)
         {
-            return "Hello World!";
+            var resultado = CidadeRepository.Cidades;
+            if (!string.IsNullOrEmpty(nome))
+            {
+                resultado = CidadeRepository.Cidades.Where(cidade => cidade.Nome == nome).ToList();
+            }
+            return resultado;
         }
     }
 }
