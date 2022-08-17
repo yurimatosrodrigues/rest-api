@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Cidades";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+
+    @ViewBag.MensagemGravacao<br/>       
+
+    <form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="Index">
+        Id: <input id="txtIdCidade" name="IdCidade"/> <br/><br/>
+        Nome: <input id="Nome" name="Nome" /> <br/><br/>
+        População: <input id="txtPopulacao" name="Populacao"/> <br/><br/>
+        Estado: 
+        <select id="selEstado" name="Estado">
+            <option>11</option>
+            <option>31</option>
+        </select> <br/><br/>
+        País:
+        <select id="selPais" name="Pais">
+            <option>55</option>            
+        </select> <br/><br/>
+
+        <input type="submit" name="Submit" id="btnSubmit" value="Gravar"/>
+    </form>    
+</div>
