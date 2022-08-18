@@ -58,6 +58,36 @@ namespace WebClient.Controllers
             return View();
         }
 
+        public async Task<IActionResult> GetCidades()
+        {
+            List<Cidade> cidades = new List<Cidade>();
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    using (var resposta = await httpClient.GetAsync(
+                           $"https://localhost:7073/paises/55/estados/11/cidades"))
+                    {
+                        if(resposta.StatusCode == HttpStatusCode.OK)
+                        {
+                            var conteudo = resposta.Content.ReadAsStringAsync().Result;
+                            if(!string.IsNullOrEmpty(conteudo))
+                                cidades = JsonSerializer.Deserialize<List<Cidade>>(conteudo);
+                        }
+                        else
+                        {
+                            ViewBag.ErroBusca = $"Ocorreu um erro ao buscar as cidades.";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErroBusca = $"Ocorreu um erro: {ex.Message}";
+            }
+            return View(cidades);
+        }
+
 
         public IActionResult Privacy()
         {
