@@ -16,11 +16,13 @@ namespace WebClient.Controllers
             _logger = logger;
         }
 
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
+        public async Task<IActionResult> Index()
+        {
+            await Cidades();
+            return View();
+        }
 
+        [HttpPost]
         public async Task<IActionResult> Index(int idCidade, string nome, int estado, int pais, int populacao)
         {
             Cidade cidade = new Cidade()
@@ -32,14 +34,14 @@ namespace WebClient.Controllers
 
             using (var httpClient = new HttpClient())
             {
-                StringContent conteudo = new StringContent(JsonSerializer.Serialize(cidade), 
+                StringContent conteudo = new StringContent(JsonSerializer.Serialize(cidade),
                     Encoding.UTF8, "application/json");
                 try
                 {
                     using (var resposta = await httpClient.PostAsync(
                         $"https://localhost:7073/paises/{pais}/estados/{estado}/cidades", conteudo))
                     {
-                        if(resposta.StatusCode == HttpStatusCode.Created)
+                        if (resposta.StatusCode == HttpStatusCode.Created)
                         {
                             //Sucesso
                             ViewBag.MensagemGravacao = "Gravado com sucesso!";
@@ -54,13 +56,14 @@ namespace WebClient.Controllers
                 {
                     ViewBag.MensagemGravacao = $"Ocorreu um erro : {ex.Message}";
                 }
-            }            
-            return View();
+            }
+            return await Index();
         }
 
-        public async Task<IActionResult> GetCidades()
+        [HttpGet]
+        public async Task<IActionResult> Cidades()
         {
-            List<Cidade> cidades = new List<Cidade>();
+            List<Cidade> Cidades = new List<Cidade>();
             try
             {
                 using (var httpClient = new HttpClient())
@@ -68,15 +71,19 @@ namespace WebClient.Controllers
                     using (var resposta = await httpClient.GetAsync(
                            $"https://localhost:7073/paises/55/estados/11/cidades"))
                     {
-                        if(resposta.StatusCode == HttpStatusCode.OK)
+                        if (resposta.StatusCode == HttpStatusCode.OK)
                         {
                             var conteudo = resposta.Content.ReadAsStringAsync().Result;
-                            if(!string.IsNullOrEmpty(conteudo))
-                                cidades = JsonSerializer.Deserialize<List<Cidade>>(conteudo);
+                            if (!string.IsNullOrEmpty(conteudo))
+                                Cidades = JsonSerializer.Deserialize<List<Cidade>>(conteudo,
+                                    new JsonSerializerOptions
+                                    {
+                                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                                    })!;
                         }
                         else
                         {
-                            ViewBag.ErroBusca = $"Ocorreu um erro ao buscar as cidades.";
+                            ViewBag.ErroBusca = $"Ocorreu um erro ao buscar as cidades. StatusCode: {resposta.StatusCode.ToString()}.";
                         }
                     }
                 }
@@ -85,7 +92,7 @@ namespace WebClient.Controllers
             {
                 ViewBag.ErroBusca = $"Ocorreu um erro: {ex.Message}";
             }
-            return View(cidades);
+            return View(Cidades);
         }
 
 
